@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // IMPORTANT: Replace with your YouTube Data API key
     // WARNING: Do not share your API key publicly.
-    const API_KEY = "";
+    const API_KEY = "Add_API_KEY";
 
     // Replace with the Channel IDs of your creators
     const creatorChannelIds = [
@@ -134,4 +134,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Call the main function to fetch and display everything
     fetchVideos();
+
 });
