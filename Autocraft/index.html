@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My SMP Videos</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f0f0; margin: 0; padding: 0; }
+
+        /* Overall layout with a sidebar */
+        .main-container {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px; /* Static width for the sidebar */
+            height: 100vh;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+        }
+        
+        .content-area {
+            flex-grow: 1; /* Takes up the remaining space */
+            padding: 20px;
+            text-align: center;
+        }
+
+        #banner-img {
+            width: 100%;
+            max-width: 1000px;
+            display: block;
+            margin: 0 auto 20px auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .video-container { 
+            display: flex; 
+            flex-direction: column;
+            gap: 20px; 
+            align-items: center; 
+        }
+
+        /* Outlined box for each video */
+        .video { 
+            background-color: white; 
+            border: 1px solid #ccc; /* Adds the outline */
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+            overflow: hidden; 
+            width: 650px; /* Adjusted width to accommodate new layout */
+            transition: transform 0.2s; 
+            display: flex; /* Flexbox for icon and video details */
+            align-items: center;
+            padding: 10px;
+        }
+
+        .video:hover { transform: translateY(-5px); }
+
+        .channel-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .video-content {
+            display: flex;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .video-content .thumbnail {
+            width: 178px;
+            height: 100px;
+            object-fit: cover;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .video-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .video-details a { text-decoration: none; color: #333; font-weight: bold; font-size: 1.1em; display: block; margin-bottom: 5px; }
+        .video-details p { margin: 0; color: #666; font-size: 0.9em; }
+
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="sidebar">
+            <h3 style="text-align: center;">Channel Links</h3>
+            <div id="channel-links">
+                <a href="https://www.youtube.com/@bear818">Bear</a><br>
+                <a href="https://youtube.com/@dunepeaches">DunePeaches</a><br>
+                <a href="https://youtube.com/@EnkiMC">Enki</a><br>
+                <a href="https://www.youtube.com/@fcdxa">Fcdxa</a><br>
+                <a href="https://www.youtube.com/@Fireflyer">FireFlyer</a><br>
+                <a href="https://www.youtube.com/@Friendly_Newb">FriendlyNewb</a><br>
+                <a href="https://www.youtube.com/@geobug8586">GeoBug</a><br>
+                <a href="https://www.youtube.com/@HeartGamer26">HeartGamer</a><br>
+                <a href="https://youtube.com/@jushik50">Jushik</a><br>
+                <a href="https://www.youtube.com/@Justrosiie">JustRosiie</a><br>
+                <a href="https://www.youtube.com/@KeaneMC">Keane</a><br>
+                <a href="https://www.youtube.com/@KingOCandles">King o' Candles</a><br>
+                <a href="https://www.youtube.com/@klachin">Klachin</a><br>
+                <a href="https://youtube.com/@marshjewel3">Marshjewel</a><br>
+                <a href="https://youtube.com/@MrCrink">MrCrink</a><br>
+                <a href="https://youtube.com/@prokitman">ProKitman</a><br>
+                <a href="https://youtube.com/@RusticDragon_">RusticDragon</a><br>
+                <a href="https://youtube.com/@twidie_gamers">Twidie.Stef</a><br>
+                </div>
+        </div>
+
+        <div class="content-area">
+            <img id="banner-img" src="https://atlascraftmc.com/Autocraft/channels4_banner.jpg" alt="Autocraft Server Banner">
+            
+            <h1>Latest SMP Videos</h1>
+            <div id="video-list" class="video-container">
+                </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

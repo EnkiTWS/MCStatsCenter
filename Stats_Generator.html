@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Stat Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://atlascraftmc.com/tools/deepslate_brick.png'); /* Seamless Deepslate Brick Texture */
+            background-repeat: repeat;
+            background-attachment: fixed;
+            background-size: 58px; /* Control the visual size of the tiles */
+            image-rendering: pixelated; /* Keep the pixelated look */
+        }
+        /* Add a dark overlay to ensure text is readable */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(17, 24, 39, 0.85); /* bg-gray-900 with 85% opacity */
+            z-index: -1;
+        }
+        .file-input-container {
+            position: relative;
+            width: 100%;
+            height: 12rem;
+            border: 2px dashed #4A5568;
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .file-input-container:hover {
+            background-color: #2D3748;
+        }
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300A0A0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.4-5.4-13z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 0.65em auto;
+            padding-right: 2.5rem;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .tab-btn.active {
+            background-color: #0891B2; /* cyan-600 */
+            color: #FFFFFF;
+        }
+        .combobox-container {
+            position: relative;
+            border: 1px solid #4A5568;
+            border-radius: 0.5rem;
+            transition: border-color 0.2s;
+        }
+        .combobox-container:focus-within {
+            border-color: #0891B2;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.4);
+        }
+        .combobox-container input {
+            border-bottom: 1px solid #4A5568;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        .combobox-container select {
+            border: none;
+            border-radius: 0 0 0.5rem 0.5rem;
+        }
+        .combobox-container input, .combobox-container select {
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            box-shadow: none;
+            outline: none;
+        }
+        #player-skin-img, #creator-player-skin-img {
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed top-0 left-0 w-full bg-gray-900/50 backdrop-blur-sm border-b border-white/20 z-50">
+        <div class="max-w-1xl mx-auto px-2">
+            <div class="flex items-center space-x-6 h-12">
+                <a href="https://atlascraftmc.com" class="text-sm text-cyan-400 hover:text-cyan-300 transition underline">Home</a>
+                <a href="https://atlascraftmc.com/MCStats.html" class="text-sm text-cyan-400 hover:text-cyan-300 transition underline">Stats Creation Page</a>
+                <a href="https://atlascraftmc.com/Autocraft/" class="text-sm text-cyan-400 hover:text-cyan-300 transition underline">All Autocraft Episodes</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="w-full max-w-4xl mx-auto text-center pt-24 px-4">
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-7xl mx-auto">
+        <header class="text-center mb-8">
+            <img src="https://www.minecraft.net/content/dam/games/minecraft/logos/logo-minecraft.svg" alt="Minecraft Logo" class="mx-auto h-20">
+            <h1 class="text-3xl font-bold text-cyan-400">Stat Tool</h1>
+            <a href="#" id="upload-new-btn" class="hidden text-sm text-cyan-400 hover:text-cyan-300 transition mt-2 block underline">Upload New Stat File</a>
+        </header>
+
+        <main>
+            <div id="upload-section" class="bg-gray-800/80 backdrop-blur-sm p-8 rounded-xl shadow-2xl max-w-2xl mx-auto">
+                 <p class="text-center text-gray-300 mb-4">First, upload your stats <code class="text-xs">.json</code> file.</p>
+                <div class="file-input-container" id="drop-zone">
+                    <input type="file" id="file-input" class="file-input" accept=".json">
+                    <div class="text-center text-gray-400">
+                        <svg class="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                        <p class="mt-2"><span class="font-semibold text-cyan-400">Click to upload</span> or drag and drop</p>
+                        <p id="file-name" class="text-sm text-gray-300 mt-2"></p>
+                    </div>
+                </div>
+                <div id="error-message" class="text-red-400 text-center mt-4"></div>
+            </div>
+
+            <div id="tool-section" class="hidden">
+                <div class="mb-4 flex justify-center border-b border-gray-700">
+                    <button id="viewer-tab-btn" class="tab-btn active px-6 py-3 font-medium text-gray-300 rounded-t-lg transition">Stat Viewer</button>
+                    <button id="creator-tab-btn" class="tab-btn px-6 py-3 font-medium text-gray-300 rounded-t-lg transition">File Creator</button>
+                </div>
+
+                <div id="viewer-content" class="flex flex-col md:flex-row gap-8">
+                    <div id="player-skin-container" class="hidden md:w-48 flex-shrink-0 text-center">
+                        <img id="player-skin-img" src="" alt="Player Skin" class="mx-auto rounded-lg shadow-lg bg-gray-700/50 w-full h-auto">
+                        <p id="player-name-display" class="text-cyan-300 text-lg mt-2 h-6 font-bold"></p>
+                    </div>
+                    <div id="stats-display-area" class="flex-grow">
+                        </div>
+                </div>
+
+                <div id="creator-content" class="hidden bg-gray-800/80 backdrop-blur-sm p-8 rounded-xl shadow-2xl space-y-6 max-w-2xl mx-auto">
+                    <div id="creator-player-skin-container" class="hidden text-center mb-4">
+                        <img id="creator-player-skin-img" src="" alt="Player Skin" class="mx-auto rounded-lg shadow-lg bg-gray-700/50 w-24 h-auto">
+                        <p id="creator-player-name-display" class="text-cyan-300 text-md mt-2 h-6 font-bold"></p>
+                    </div>
+                    <div class="relative">
+                        <label for="search-all-input" class="block text-sm font-medium text-gray-300 mb-2">Search All Stats</label>
+                        <input type="text" id="search-all-input" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2.5 focus:ring-cyan-500 focus:border-cyan-500" placeholder="e.g., Diamond, Jump, Zombie...">
+                        <div id="search-all-results" class="hidden absolute z-10 w-full bg-gray-700 border border-gray-600 rounded-lg mt-1 max-h-60 overflow-y-auto">
+                            </div>
+                    </div>
+                    <hr class="border-gray-600">
+                    <div>
+                        <label for="category-select" class="block text-sm font-medium text-gray-300 mb-2">Category</label>
+                        <select id="category-select" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2.5 focus:ring-cyan-500 focus:border-cyan-500"><option>Waiting for file...</option></select>
+                    </div>
+
+                    <div id="combine-section" class="hidden items-center pt-2">
+                        <input id="combine-checkbox" type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-700 text-cyan-600 focus:ring-cyan-500">
+                        <label for="combine-checkbox" class="ml-3 block text-sm font-medium text-gray-300">Combine Like Stats</label>
+                    </div>
+
+                    <div id="stat-select-div">
+                        <label for="stat-search-input" class="block text-sm font-medium text-gray-300 mb-2">Search & Select Stat</label>
+                        <div class="combobox-container">
+                            <input type="text" id="stat-search-input" class="w-full bg-gray-800 text-white p-2.5" placeholder="Type to filter..." disabled>
+                            <select id="stat-select" class="w-full bg-gray-700 text-white p-2.5" disabled><option>Select category first...</option></select>
+                        </div>
+                    </div>
+
+                    <div id="group-select-div" class="hidden">
+                        <label for="group-select" class="block text-sm font-medium text-gray-300 mb-2">Stat Group</label>
+                        <select id="group-select" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2.5 focus:ring-cyan-500 focus:border-cyan-500" disabled><option>Select category first...</option></select>
+                    </div>
+
+                    <div id="localization-inputs" class="hidden space-y-4 pt-2">
+                        <div>
+                            <label for="award-title" class="block text-sm font-medium text-gray-300 mb-2">Award Title</label>
+                            <input type="text" id="award-title" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2.5 focus:ring-cyan-500 focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label for="award-desc" class="block text-sm font-medium text-gray-300 mb-2">Award Description</label>
+                            <input type="text" id="award-desc" class="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2.5 focus:ring-cyan-500 focus:border-cyan-500">
+                        </div>
+                    </div>
+
+                    <div class="pt-4">
+                        <button id="create-btn" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Create Files</button>
+                    </div>
+
+                    <div id="output-section" class="hidden pt-6 space-y-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-cyan-300 mb-4">Stat Reader File (.json)</h2>
+                            <pre class="bg-gray-900 p-4 rounded-lg text-sm text-cyan-200"><code id="json-output"></code></pre>
+                            <a id="download-link" class="mt-4 inline-block w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">Download Stat File</a>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-cyan-300 mb-4">Localization File (en_us.json)</h2>
+                            <pre class="bg-gray-900 p-4 rounded-lg text-sm text-yellow-200"><code id="lang-output"></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const uploadSection = document.getElementById('upload-section');
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileNameDisplay = document.getElementById('file-name');
+        const errorMessage = document.getElementById('error-message');
+        const playerNameDisplay = document.getElementById('player-name-display');
+        const uploadNewBtn = document.getElementById('upload-new-btn');
+        
+        const toolSection = document.getElementById('tool-section');
+        const viewerTabBtn = document.getElementById('viewer-tab-btn');
+        const creatorTabBtn = document.getElementById('creator-tab-btn');
+        const viewerContent = document.getElementById('viewer-content');
+        const creatorContent = document.getElementById('creator-content');
+
+        const playerSkinContainer = document.getElementById('player-skin-container');
+        const playerSkinImg = document.getElementById('player-skin-img');
+        const creatorPlayerSkinContainer = document.getElementById('creator-player-skin-container');
+        const creatorPlayerSkinImg = document.getElementById('creator-player-skin-img');
+        const creatorPlayerNameDisplay = document.getElementById('creator-player-name-display');
+        const statsDisplayArea = document.getElementById('stats-display-area');
+        const searchAllInput = document.getElementById('search-all-input');
+        const searchAllResults = document.getElementById('search-all-results');
+        const categorySelect = document.getElementById('category-select');
+        const combineSection = document.getElementById('combine-section');
+        const combineCheckbox = document.getElementById('combine-checkbox');
+        const statSelectDiv = document.getElementById('stat-select-div');
+        const statSearchInput = document.getElementById('stat-search-input');
+        const statSelect = document.getElementById('stat-select');
+        const groupSelectDiv = document.getElementById('group-select-div');
+        const groupSelect = document.getElementById('group-select');
+        const localizationInputs = document.getElementById('localization-inputs');
+        const awardTitleInput = document.getElementById('award-title');
+        const awardDescInput = document.getElementById('award-desc');
+        const createBtn = document.getElementById('create-btn');
+        const outputSection = document.getElementById('output-section');
+        const jsonOutput = document.getElementById('json-output');
+        const langOutput = document.getElementById('lang-output');
+        const downloadLink = document.getElementById('download-link');
+
+        // --- State & Config ---
+        let loadedStats = {};
+        let allStatsFlat = [];
+        const itemCategories = ['mined', 'crafted', 'used', 'broken', 'picked_up', 'dropped'];
+        const mobCategories = ['killed', 'killed_by'];
+        const allItemCats = itemCategories.map(c => `minecraft:${c}`);
+
+        const statGroups = {
+            'all-blocks-placed': { label: 'All Blocks Placed', pattern: 'minecraft:(.+_(block|planks|log|wood|stairs|slab|wall|fence|gate|door|trapdoor|plate|button|bed|carpet|wool|terracotta|concrete|glass|pane|ore)|(stone|dirt|sand|gravel|cobblestone|obsidian|netherrack|end_stone|torch|lantern|chest|furnace|crafting_table|anvil|piston|tnt|hay|leaves|dripstone|amethyst|sculk|shulker_box))', categories: ['minecraft:used'] },
+            'all-slabs': { label: 'All Slabs', pattern: 'minecraft:.+_slab', categories: allItemCats },
+            'all-boats': { label: 'All Boats', pattern: 'minecraft:.+_boat', categories: allItemCats },
+            'all-swords': { label: 'All Swords', pattern: 'minecraft:.+_sword', categories: allItemCats },
+            'all-pickaxes': { label: 'All Pickaxes', pattern: 'minecraft:.+_pickaxe', categories: allItemCats },
+            'all-axes': { label: 'All Axes', pattern: 'minecraft:.+_axe', categories: allItemCats },
+            'all-shovels': { label: 'All Shovels', pattern: 'minecraft:.+_shovel', categories: allItemCats },
+            'all-hoes': { label: 'All Hoes', pattern: 'minecraft:.+_hoe', categories: allItemCats },
+            'all-logs': { label: 'All Logs & Wood', pattern: 'minecraft:.+_(log|wood)$', categories: allItemCats },
+            'all-planks': { label: 'All Planks', pattern: 'minecraft:.+_planks', categories: allItemCats },
+            'all-diamond-gear': { label: 'All Diamond Gear', pattern: 'minecraft:diamond_.+', categories: allItemCats },
+            'all-netherite-gear': { label: 'All Netherite Gear', pattern: 'minecraft:netherite_.+', categories: allItemCats },
+            'all-iron-gear': { label: 'All Iron Gear', pattern: 'minecraft:iron_.+', categories: allItemCats },
+            'all-stone-tools': { label: 'All Stone Tools', pattern: 'minecraft:stone_(sword|pickaxe|axe|shovel|hoe)', categories: allItemCats },
+            'all-wooden-tools': { label: 'All Wooden Tools', pattern: 'minecraft:wooden_(sword|pickaxe|axe|shovel|hoe)', categories: allItemCats },
+            'all-golden-tools': { label: 'All Golden Tools', pattern: 'minecraft:golden_(sword|pickaxe|axe|shovel|hoe)', categories: allItemCats },
+            'all-diamond-tools': { label: 'All Diamond Tools', pattern: 'minecraft:diamond_(sword|pickaxe|axe|shovel|hoe)', categories: allItemCats },
+            'all-mobs': { label: 'All Mobs', pattern: 'minecraft:.+', categories: mobCategories.map(c => `minecraft:${c}`) },
+        };
+
+        // --- File Handling and Initialization ---
+        async function fetchPlayerName(uuid) {
+            playerNameDisplay.textContent = 'Fetching player name...';
+            creatorPlayerNameDisplay.textContent = 'Fetching...';
+            playerSkinContainer.classList.add('hidden');
+            creatorPlayerSkinContainer.classList.add('hidden');
+            playerSkinImg.src = '';
+            creatorPlayerSkinImg.src = '';
+            try {
+                const response = await fetch(`https://api.ashcon.app/mojang/v2/user/${uuid}`);
+                if (!response.ok) throw new Error('Player not found');
+                const data = await response.json();
+                playerNameDisplay.textContent = data.username;
+                creatorPlayerNameDisplay.textContent = data.username;
+                const skinUrl = `https://visage.surgeplay.com/full/512/${uuid}`;
+                playerSkinImg.src = skinUrl;
+                creatorPlayerSkinImg.src = skinUrl;
+                playerSkinContainer.classList.remove('hidden');
+                creatorPlayerSkinContainer.classList.remove('hidden');
+            } catch (error) {
+                console.error("Could not fetch player name:", error);
+                playerNameDisplay.textContent = 'Could not fetch player name.';
+                creatorPlayerNameDisplay.textContent = 'Could not fetch player name.';
+            }
+        }
+
+        function handleFile(file) {
+            errorMessage.textContent = '';
+            playerNameDisplay.textContent = '';
+            if (!file || file.type !== 'application/json') {
+                errorMessage.textContent = 'Invalid file type. Please upload a .json file.';
+                return;
+            }
+
+            const fileName = file.name;
+            const uuidMatch = fileName.match(/^([0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12})/);
+            if (uuidMatch) {
+                const uuid = uuidMatch[1].replace(/-/g, '');
+                fetchPlayerName(uuid);
+            } else {
+                playerNameDisplay.textContent = 'Could not determine player from filename.';
+            }
+
+            fileNameDisplay.textContent = `Processing: ${fileName}`;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const json = JSON.parse(event.target.result);
+                    if (json.stats && typeof json.stats === 'object') {
+                        loadedStats = json.stats;
+                        initializeTools();
+                    } else {
+                        errorMessage.textContent = 'Invalid stats file. Must contain a top-level "stats" object.';
+                    }
+                } catch (error) {
+                    errorMessage.textContent = 'Error parsing JSON. Please ensure the file is valid.';
+                    console.error("JSON Parsing Error:", error);
+                }
+            };
+            reader.onerror = () => errorMessage.textContent = 'Error reading the file.';
+            reader.readAsText(file);
+        }
+
+        function initializeTools() {
+            uploadSection.classList.add('hidden');
+            toolSection.classList.remove('hidden');
+            uploadNewBtn.classList.remove('hidden');
+            
+            flattenAllStats();
+            initializeViewer();
+            initializeCreator();
+
+            switchTab('viewer');
+        }
+
+        function switchTab(tabName) {
+            if (tabName === 'viewer') {
+                viewerContent.classList.remove('hidden');
+                creatorContent.classList.add('hidden');
+                viewerTabBtn.classList.add('active');
+                creatorTabBtn.classList.remove('active');
+            } else {
+                viewerContent.classList.add('hidden');
+                creatorContent.classList.remove('hidden');
+                viewerTabBtn.classList.remove('active');
+                creatorTabBtn.classList.add('active');
+            }
+        }
+
+        // --- Stat Viewer Logic ---
+        function initializeViewer() {
+            statsDisplayArea.innerHTML = '';
+            renderStats(loadedStats);
+        }
+
+        function formatStatName(rawName) {
+            const parts = rawName.split(':');
+            let name = parts[parts.length - 1];
+            name = name.replace(/_/g, ' ');
+            return name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        function formatStatValue(key, value) {
+            if (key.includes('_cm')) {
+                const meters = value / 100;
+                return meters > 1000 ? `${(meters / 1000).toFixed(2)} km` : `${meters.toFixed(2)} m`;
+            }
+            if (key.includes('_one_minute')) {
+                 const seconds = value / 20;
+                 const hours = seconds / 3600;
+                 return hours < 1 ? `${(seconds / 60).toFixed(1)} minutes` : `${hours.toFixed(2)} hours`;
+            }
+            if (key.includes('damage_dealt') || key.includes('damage_taken')) {
+                return `${(value / 10).toFixed(1)} hearts`;
+            }
+            return value.toLocaleString();
+        }
+
+        function renderStats(stats) {
+            const categoryOrder = ['minecraft:custom', 'minecraft:mined', 'minecraft:crafted', 'minecraft:used', 'minecraft:broken', 'minecraft:picked_up', 'minecraft:dropped', 'minecraft:killed', 'minecraft:killed_by'];
+            
+            for (const categoryKey of categoryOrder) {
+                if (stats[categoryKey]) {
+                    const categoryData = stats[categoryKey];
+                    const categoryElement = document.createElement('div');
+                    categoryElement.className = 'mb-8';
+                    
+                    const categoryTitle = document.createElement('h2');
+                    categoryTitle.className = 'text-2xl font-bold text-cyan-300 border-b-2 border-gray-700 pb-2 mb-4';
+                    categoryTitle.textContent = formatStatName(categoryKey);
+                    categoryElement.appendChild(categoryTitle);
+
+                    const grid = document.createElement('div');
+                    grid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4';
+                    
+                    const sortedKeys = Object.keys(categoryData).sort((a, b) => formatStatName(a).localeCompare(formatStatName(b)));
+
+                    for (const statKey of sortedKeys) {
+                        const card = document.createElement('div');
+                        card.className = 'bg-gray-800/80 backdrop-blur-sm p-4 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-200 cursor-pointer';
+                        card.dataset.categoryKey = categoryKey;
+                        card.dataset.statKey = statKey;
+                        card.addEventListener('dblclick', handleStatCardDoubleClick);
+                        card.innerHTML = `<p class="text-sm text-gray-400 pointer-events-none">${formatStatName(statKey)}</p><p class="text-xl font-bold text-white pointer-events-none">${formatStatValue(statKey, categoryData[statKey])}</p>`;
+                        grid.appendChild(card);
+                    }
+                    categoryElement.appendChild(grid);
+                    statsDisplayArea.appendChild(categoryElement);
+                }
+            }
+        }
+
+        // --- File Creator Logic ---
+        function flattenAllStats() {
+            allStatsFlat = [];
+            for (const categoryKey in loadedStats) {
+                for (const statKey in loadedStats[categoryKey]) {
+                    allStatsFlat.push({
+                        statKey: statKey,
+                        categoryKey: categoryKey,
+                        formattedName: formatStatName(statKey)
+                    });
+                }
+            }
+        }
+
+        function selectStatInCreator(categoryKey, statKey) {
+            switchTab('creator');
+            combineCheckbox.checked = false;
+            statSelectDiv.classList.remove('hidden');
+            groupSelectDiv.classList.add('hidden');
+            categorySelect.value = categoryKey;
+            categorySelect.dispatchEvent(new Event('change', { bubbles: true }));
+            statSearchInput.value = '';
+            updateStatDropdown();
+            statSelect.value = statKey;
+            statSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        function handleStatCardDoubleClick(event) {
+            const card = event.currentTarget;
+            selectStatInCreator(card.dataset.categoryKey, card.dataset.statKey);
+        }
+
+        function handleSearchResultClick(event) {
+            const target = event.currentTarget;
+            selectStatInCreator(target.dataset.categoryKey, target.dataset.statKey);
+            searchAllInput.value = '';
+            searchAllResults.classList.add('hidden');
+        }
+        
+        function initializeCreator() {
+            const categories = Object.keys(loadedStats).sort();
+            populateSelect(categorySelect, categories, 'Choose a category...');
+            resetSelect(statSelect, 'Select category first...');
+            statSearchInput.disabled = true;
+            checkFormValidity();
+        }
+        
+        function updateStatDropdown() {
+            const categoryKey = categorySelect.value;
+            if (!categoryKey || !loadedStats[categoryKey]) {
+                resetSelect(statSelect, 'Select category first...');
+                statSearchInput.disabled = true;
+                return;
+            }
+            statSearchInput.disabled = false;
+            const searchTerm = statSearchInput.value.toLowerCase();
+            const allStatsInCategory = Object.keys(loadedStats[categoryKey]);
+            const filteredStats = allStatsInCategory.filter(statKey =>
+                formatStatName(statKey).toLowerCase().includes(searchTerm)
+            );
+            filteredStats.sort((a, b) => formatStatName(a).localeCompare(formatStatName(b)));
+            if (filteredStats.length > 0) {
+                populateSelect(statSelect, filteredStats, 'Choose a stat...');
+            } else {
+                resetSelect(statSelect, 'No stats match your search.');
+            }
+            checkFormValidity();
+        }
+
+        function populateSelect(selectElement, options, defaultText, isGroup = false) {
+            selectElement.innerHTML = `<option selected disabled value="">${defaultText}</option>`;
+            options.forEach(optionValue => {
+                const optionElement = document.createElement('option');
+                optionElement.value = isGroup ? optionValue : optionValue;
+                optionElement.textContent = isGroup ? statGroups[optionValue].label : formatStatName(optionValue);
+                selectElement.appendChild(optionElement);
+            });
+            selectElement.disabled = false;
+        }
+
+        function resetSelect(selectElement, text) {
+            selectElement.innerHTML = `<option value="">${text}</option>`;
+            selectElement.disabled = true;
+        }
+        
+        function updateLocalizationInputs() {
+            const isGroup = combineCheckbox.checked;
+            const selection = isGroup ? groupSelect.value : statSelect.value;
+            if (!selection) {
+                localizationInputs.classList.add('hidden');
+                return;
+            }
+            
+            localizationInputs.classList.remove('hidden');
+            
+            const title = isGroup ? statGroups[selection].label : formatStatName(selection);
+            let categoryShortName = categorySelect.value.split(':')[1];
+            if (categoryShortName.endsWith('e') && categoryShortName !== 'leave') {
+                 categoryShortName = categoryShortName.slice(0, -1);
+            }
+            if (!['mined', 'crafted', 'used', 'broken', 'picked_up', 'dropped', 'killed'].includes(categoryShortName)) {
+                categoryShortName = '';
+            } else {
+                categoryShortName += 'd';
+            }
+
+            awardTitleInput.value = title;
+            awardDescInput.value = `${title} ${categoryShortName}`.trim();
+        }
+
+        function checkFormValidity() {
+            let isReady = false;
+            if (combineCheckbox.checked) {
+                isReady = categorySelect.value && groupSelect.value;
+            } else {
+                isReady = categorySelect.value && statSelect.value;
+            }
+            createBtn.disabled = !isReady;
+        }
+
+        function generateJson() {
+            const categoryKey = categorySelect.value;
+            const categoryShortName = categoryKey.split(':')[1];
+            let fileContent;
+            let idForLang;
+
+            if (combineCheckbox.checked) {
+                const groupKey = groupSelect.value;
+                const group = statGroups[groupKey];
+                idForLang = groupKey.replace(/-/g, '_');
+                
+                if (categoryShortName === 'crafted') idForLang = `craft_${idForLang}`;
+                else if (categoryShortName === 'mined') idForLang = `mine_${idForLang}`;
+                else if (categoryShortName === 'used') idForLang = `used_${idForLang}`;
+                else if (categoryShortName === 'killed') idForLang = `kill_${idForLang}`;
+                else if (categoryShortName === 'killed_by') idForLang = `killed_by_${idForLang}`;
+
+                fileContent = {
+                    id: idForLang,
+                    unit: 'int',
+                    reader: { "$type": "match-sum", path: [categoryKey], patterns: [group.pattern] }
+                };
+            } else {
+                const statKey = statSelect.value;
+                const statName = statKey.split(':').pop();
+                idForLang = statName;
+                if (idForLang.endsWith('_one_cm')) idForLang = idForLang.replace('_one_cm', '');
+                if (idForLang.endsWith('_one_minute')) idForLang = idForLang.replace('_one_minute', '');
+                
+                if (categoryShortName === 'crafted') idForLang = `craft_${idForLang}`;
+                else if (categoryShortName === 'mined') idForLang = `mine_${idForLang}`;
+                else if (categoryShortName === 'used') idForLang = `used_${idForLang}`;
+                else if (categoryShortName === 'killed') idForLang = `kill_${idForLang}`;
+                else if (categoryShortName === 'killed_by') idForLang = `killed_by_${idForLang}`;
+
+                let unit = "int";
+                if (statName.endsWith('_cm')) unit = "cm";
+                else if (statName.includes('_one_minute') || statName.includes('_time')) unit = "ticks";
+                else if (statName.includes('damage')) unit = "tenths_of_heart";
+                
+                fileContent = {
+                    id: idForLang,
+                    unit: unit,
+                    reader: { "$type": "int", path: [categoryKey, statKey] }
+                };
+            }
+            
+            const jsonString = JSON.stringify(fileContent, null, 4);
+            jsonOutput.textContent = jsonString;
+
+            const awardTitle = awardTitleInput.value;
+            const awardDesc = awardDescInput.value;
+            const langContent = `{\n    "award.${idForLang}.desc": "${awardDesc}",\n    "award.${idForLang}.title": "${awardTitle}"\n}`;
+            langOutput.textContent = langContent;
+
+            outputSection.classList.remove('hidden');
+
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = `${fileContent.id}.json`;
+        }
+
+        // --- Event Listeners ---
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-gray-700', 'border-cyan-400'); });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('bg-gray-700', 'border-cyan-400'); });
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('bg-gray-700', 'border-cyan-400'); handleFile(e.dataTransfer.files[0]); });
+        dropZone.addEventListener('click', (e) => {
+            if (e.target !== fileInput) {
+              fileInput.click();
+            }
+        });
+
+        viewerTabBtn.addEventListener('click', () => switchTab('viewer'));
+        creatorTabBtn.addEventListener('click', () => switchTab('creator'));
+
+        uploadNewBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            toolSection.classList.add('hidden');
+            uploadSection.classList.remove('hidden');
+            uploadNewBtn.classList.add('hidden');
+            playerNameDisplay.textContent = '';
+            fileNameDisplay.textContent = '';
+            errorMessage.textContent = '';
+            loadedStats = {};
+            playerSkinContainer.classList.add('hidden');
+            playerSkinImg.src = '';
+            creatorPlayerSkinContainer.classList.add('hidden');
+            creatorPlayerSkinImg.src = '';
+        });
+
+        searchAllInput.addEventListener('input', () => {
+            const searchTerm = searchAllInput.value.toLowerCase();
+            if (searchTerm.length < 2) {
+                searchAllResults.innerHTML = '';
+                searchAllResults.classList.add('hidden');
+                return;
+            }
+            const results = allStatsFlat.filter(stat => stat.formattedName.toLowerCase().includes(searchTerm));
+            
+            searchAllResults.innerHTML = '';
+            if (results.length === 0) {
+                searchAllResults.classList.add('hidden');
+                return;
+            }
+            results.slice(0, 50).forEach(result => { // Limit to 50 results for performance
+                const item = document.createElement('div');
+                item.className = 'p-2 hover:bg-cyan-600 cursor-pointer';
+                item.textContent = `${result.formattedName} (${formatStatName(result.categoryKey)})`;
+                item.dataset.statKey = result.statKey;
+                item.dataset.categoryKey = result.categoryKey;
+                item.addEventListener('click', handleSearchResultClick);
+                searchAllResults.appendChild(item);
+            });
+            searchAllResults.classList.remove('hidden');
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!searchAllInput.contains(e.target) && !searchAllResults.contains(e.target)) {
+                searchAllResults.classList.add('hidden');
+            }
+        });
+
+        categorySelect.addEventListener('change', () => {
+            const categoryKey = categorySelect.value;
+            const categoryShortName = categoryKey.split(':')[1];
+
+            if (itemCategories.includes(categoryShortName) || mobCategories.includes(categoryShortName)) {
+                combineSection.classList.remove('hidden');
+            } else {
+                combineSection.classList.add('hidden');
+            }
+            
+            statSearchInput.value = '';
+            updateStatDropdown();
+            
+            const relevantGroups = Object.keys(statGroups).filter(key => 
+                statGroups[key].categories.includes(categoryKey)
+            );
+            populateSelect(groupSelect, relevantGroups, 'Choose a group...', true);
+            
+            combineCheckbox.checked = false;
+            statSelectDiv.classList.remove('hidden');
+            groupSelectDiv.classList.add('hidden');
+            localizationInputs.classList.add('hidden');
+            outputSection.classList.add('hidden');
+            checkFormValidity();
+        });
+
+        combineCheckbox.addEventListener('change', () => {
+            if (combineCheckbox.checked) {
+                statSelectDiv.classList.add('hidden');
+                groupSelectDiv.classList.remove('hidden');
+                resetSelect(statSelect, 'Select category first...');
+            } else {
+                statSelectDiv.classList.remove('hidden');
+                groupSelectDiv.classList.add('hidden');
+                resetSelect(groupSelect, 'Select category first...');
+            }
+            updateLocalizationInputs();
+            outputSection.classList.add('hidden');
+            checkFormValidity();
+        });
+        
+        statSearchInput.addEventListener('input', updateStatDropdown);
+        statSelect.addEventListener('change', () => {
+            updateLocalizationInputs();
+            checkFormValidity();
+        });
+        groupSelect.addEventListener('change', () => {
+             updateLocalizationInputs();
+            checkFormValidity();
+        });
+        createBtn.addEventListener('click', (e) => { e.preventDefault(); if (!createBtn.disabled) generateJson(); });
+    </script>
+</body>
+</html>

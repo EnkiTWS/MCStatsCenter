@@ -1,0 +1,69 @@
+{
+    "siteTitle": "Stat Central",
+    "logoUrl": "https://www.minecraft.net/content/dam/games/minecraft/logos/logo-minecraft.svg",
+    "backgroundImage": "https://atlascraftmc.com/tools/deepslate_brick.png",
+    "backgroundOverlay": "rgba(17, 24, 39, 0.85)",
+    "navLinks": [
+        { "text": "Home", "url": "https://atlascraftmc.com" },
+        { "text": "Stats Creation Page", "url": "https://atlascraftmc.com/MCStats.html" },
+        { "text": "All Autocraft Episodes", "url": "https://atlascraftmc.com/Autocraft/" }
+    ],
+    "cardStyles": {
+        "cardBg": "bg-gray-800/80",
+        "headerColor": "text-cyan-400",
+        "headerBorder": "border-cyan-700",
+        "normalLinkBg": "bg-gray-700/70 hover:bg-cyan-800/80",
+        "downloadLinkBg": "bg-cyan-700/80 hover:bg-cyan-600/80 font-semibold flex items-center justify-center"
+    },
+    "worldDownloadSVG": "<svg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='currentColor' class='w-5 h-5 mr-2'><path stroke-linecap='round' stroke-linejoin='round' d='M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3' /></svg>",
+    "cardsData": [
+        {
+            "title": "Autocraft",
+            "links": [
+                { "text": "World Download", "url": "https://atlascraftmc.com/test/AutocraftDownloads.html", "download": true },
+                { "text": "Season 3", "url": "https://atlascraftmc.com/Autocraft/S3/" },
+                { "text": "Season 4", "url": "https://atlascraftmc.com/Autocraft/S4/" },
+                { "text": "Season 5", "url": "https://atlascraftmc.com/Autocraft/S5/" },
+                { "text": "Season 6", "url": "https://atlascraftmc.com/Autocraft/S6/" }
+            ]
+        },
+        {
+            "title": "Questcraft",
+            "links": [
+                { "text": "World Download", "url": "https://www.mediafire.com/folder/8rtc0f11bv3kn/Questcraft", "download": true },
+                { "text": "Season 1", "url": "https://atlascraftmc.com/Questcraft/S1" },
+                { "text": "Season 2", "url": "https://atlascraftmc.com/Questcraft/S2" },
+                { "text": "Season 3", "url": "https://atlascraftmc.com/Questcraft/S3" }
+            ]
+        },
+        {
+            "title": "Enki & Friends",
+            "links": [
+                { "text": "not available", "url": "https://atlascraftmc.com", "download": true },
+                { "text": "Atlascraft", "url": "https://atlascraftmc.com/Atlascraft/" },
+                { "text": "Make Cherwin Cry", "url": "https://atlascraftmc.com/MakeCherwinCry" }
+            ]
+        },
+        {
+            "title": "ExtraLife",
+            "links": [
+                { "text": "Not Available", "url": "https://atlascraftmc.com", "download": true },
+                { "text": "ExtraLife 2025", "url": "https://atlascraftmc.com/ExtraLife2025/" }
+            ]
+        },
+        {
+            "title": "Hermitcraft",
+            "links": [
+                { "text": "World Download", "url": "https://Hermitcraft.com", "download": true },
+                { "text": "Season 9", "url": "https://atlascraftmc.com/HermitcraftS9" }
+            ]
+        },
+        {
+            "title": "Creators' Construct",
+            "links": [
+                { "text": "Not Available", "url": "https://atlascraftmc.com", "download": true },
+                { "text": "Season 1", "url": "https://atlascraftmc.com/cc/" }
+            ]
+        }
+    ]
+}
